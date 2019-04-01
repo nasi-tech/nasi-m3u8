@@ -1,0 +1,65 @@
+{{include './include/header.html'}}
+<div class="container">
+    <button type="button" class="btn btn-primary">
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> 转码列队
+    </button>
+    <button type="button" class="btn btn-primary">
+        <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> 读取文件
+    </button>
+    <hr>
+</div>
+<div class="container">
+    <div class="col-md-4 col-md-offset-8 infoTotal">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Total</th>
+                    <th>Finished</th>
+                    <th class="text-info">Processing</th>
+                    <th class="text-warning">Waiting</th>
+                    <th class="text-danger">Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{total}}</td>
+                    <td>{{finished}}</td>
+                    <td>{{processing}}</td>
+                    <td>{{waiting}}</td>
+                    <td>{{error}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="toolbar">
+        <!-- <button class="btn btn-primary">批量操作</button> -->
+        <!-- Single button -->
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+                批量操作 <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu listUl">
+                <li><button id="buttonModifierCate" class="btn btn-primary">批量修改分类</button></li>
+                <li><button id="buttonDelete" class="btn btn-danger">批量删除</button></li>
+            </ul>
+        </div>
+
+    </div>
+    <table id="table" data-url="/movies" data-toggle="table" data-toolbar="#toolbar" data-height="650"
+        data-pagination="true" data-search="true" data-click-to-select="true"
+        data-page-list="[10, 25, 50, 100, 200, All]">
+        <thead>
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <!-- <th data-field="_id">ID</th> -->
+                <th data-field="originalname">Title</th>
+                <th data-field="createAt" data-sortable="true">Date</th>
+                <th data-field="status" data-sortable="true">Status</th>
+            </tr>
+        </thead>
+    </table>
+
+</div>
+{{include './include/footer.html'}}

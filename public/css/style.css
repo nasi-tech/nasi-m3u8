@@ -1,0 +1,24 @@
+body {
+  background: #fff;
+  color: #666666;
+  font-family: "Open Sans", sans-serif;
+  margin-top: 70px;
+}
+
+.infoTotal {
+  padding-right: 0px;
+}
+
+.listUl {
+  min-width: none;
+  background-color: transparent;
+  -webkit-background-clip: none;
+  background-clip: none;
+  border: none;
+  border-radius: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.listUl li{
+  margin-bottom: 5px;
+}
