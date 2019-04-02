@@ -3,6 +3,7 @@ $(document).ready(function () {
     var $table = $('#table')
     var $buttonDelete = $('#buttonDelete')
     var $buttonModifierCate = $('#buttonModifierCate');
+    var $buttonRead = $('#read');
 
     $buttonDelete.click(function () {
         var array = $table.bootstrapTable('getSelections');
@@ -18,6 +19,17 @@ $(document).ready(function () {
 
     $buttonModifierCate.click(function () {
         alert('$buttonModifierCate: ' + JSON.stringify($table.bootstrapTable('getSelections')))
+    });
+
+
+    $buttonRead.click(function () {
+        $.get('/scan', function (data, res) {
+            if (res == 'success') {
+                setTimeout(() => {
+                    $table.bootstrapTable('refresh');
+                }, 100);
+            }
+        });
     });
 });
 

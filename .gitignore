@@ -127,7 +127,8 @@ typings/
 node_modules
 docs/_book
 test/
-
+input
+output
 # Created by https://www.gitignore.io/api/intellij+all,webstorm+all
 # Edit at https://www.gitignore.io/?templates=intellij+all,webstorm+all
 
