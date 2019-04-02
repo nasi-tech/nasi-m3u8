@@ -14,7 +14,7 @@
             <thead>
                 <tr>
                     <th>Total</th>
-                    <th>Finished</th>
+                    <th class="text-success">Finished</th>
                     <th class="text-info">Processing</th>
                     <th class="text-warning">Waiting</th>
                     <th class="text-danger">Error</th>
@@ -55,8 +55,8 @@
                 <th data-field="state" data-checkbox="true"></th>
                 <!-- <th data-field="_id">ID</th> -->
                 <th data-field="originalname">Title</th>
-                <th data-field="createAt" data-sortable="true">Date</th>
-                <th data-field="status" data-sortable="true">Status</th>
+                <th data-field="createAt" data-formatter="dateFormat" data-sortable="true">Date</th>
+                <th data-field="status" data-formatter="status" data-sortable="true">Status</th>
             </tr>
         </thead>
     </table>

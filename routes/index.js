@@ -22,8 +22,14 @@ router.get('/', async function (req, res, next) {
 });
 
 router.get('/movies', async function (req, res, next) {
-  var responses = await Movie.find().sort('-createAt').exec();
-  res.json(responses);
+  var response = await Movie.find().sort('-createAt').exec();
+  res.json(response);
+});
+
+router.post('/movies/del', async function (req, res, next) {
+  var data = req.body['data[]'];
+  var response = await Movie.deleteMany({ _id: { $in: data } }).exec();
+  res.json(response);
 });
 
 module.exports = router;
