@@ -112,7 +112,6 @@ exports.transcode = function (movie) {
 function ffmpegtransandchunk(des, path, config, vf, id) {
     ffmpeg(path)
         .addOptions(config)
-        // .addOption('-vf', vf)
         .output(des + '/index.m3u8')
         .on('start', function () {
             Movie.findOne({
@@ -199,7 +198,7 @@ function chunk(path, des, id, config, vf, tsjiami) {
             deleteall(des);
             console.log(des)
             var tmp = fs.mkdirSync(des);
-            console.log(tmp);
+            console.log('202=>' + tmp);
             ffmpegtransandchunk(des, path, config, vf, id);
         })
         .on("start", function () {
@@ -235,21 +234,24 @@ function deleteall(path) {
     }
 };
 function togif(path, des, setting) {
-    const { gifduration, gifstart, gifwidth } = setting;
-    if (gifduration && gifstart && gifwidth) {
-        ffmpeg(path)
-            .addOptions([
-                '-ss ' + gifstart,
-                '-t ' + gifduration,
-                '-r 15',
-                '-vf scale=' + gifwidth + ':-1'
-            ])
-            .output(des + '/1.gif')
-            .on('end', function () {
-                fs.unlinkSync(path);
-            })
-            .run();
-    } else {
-        fs.unlinkSync(path);
-    }
+    // const { gifduration, gifstart, gifwidth } = setting;
+    // if (gifduration && gifstart && gifwidth) {
+    var gifstart = '1.0';
+    var gifduration = '5.0';
+    var gifwidth = '400.0';
+    ffmpeg(path)
+        .addOptions([
+            '-ss ' + gifstart,
+            '-t ' + gifduration,
+            '-r 15',
+            '-vf scale=' + gifwidth + ':-1'
+        ])
+        .output(des + '/1.gif')
+        .on('end', function () {
+            fs.unlinkSync(path);
+        })
+        .run();
+    // } else {
+    //     fs.unlinkSync(path);
+    // }
 }

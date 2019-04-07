@@ -13,16 +13,24 @@ router.get('/', async function (req, res, next) {
   var finished = responses.filter(function (value, index, array) {
     return value.status == 'finished'
   }).length;
-  var processing = responses.filter(function (value, index, array) {
+
+  var processing1 = responses.filter(function (value, index, array) {
     return value.status == 'chunking'
   }).length;
+
+  var processing2 = responses.filter(function (value, index, array) {
+    return value.status == 'trans&chunk'
+  }).length;
+
   var waiting = responses.filter(function (value, index, array) {
     return value.status == 'waiting'
   }).length;
+
   var error = responses.filter(function (value, index, array) {
     return value.status == 'error & failed'
   }).length;
-  res.render('index', { total: responses.length, finished: finished, processing: processing, waiting: waiting, error: error });
+
+  res.render('index', { total: responses.length, finished: finished, processing: processing1 + processing2, waiting: waiting, error: error });
 });
 
 router.get('/movies', async function (req, res, next) {
