@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var Movie = require('../models/movie');
+var FFmpeghelper = require('../utiles/newffmpeg');
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
@@ -16,7 +17,7 @@ router.get('/', async function (req, res, next) {
     return value.status == 'waiting'
   }).length;
   var error = responses.filter(function (value, index, array) {
-    return value.status == 'error'
+    return value.status == 'error & failed'
   }).length;
   res.render('index', { total: responses.length, finished: finished, processing: processing, waiting: waiting, error: error });
 });
@@ -26,9 +27,30 @@ router.get('/movies', async function (req, res, next) {
   res.json(response);
 });
 
+router.get('/movies/:id', async function (req, res, next) {
+  var tmp = await Movie.find({ _id: req.params.id }).exec();
+  if (tmp.length > 0) {
+    res.render('movie', {
+      movie: tmp[0]
+    })
+  } else {
+    res.redirect('/');
+  }
+});
+
+router.get('/allMovies', async function (req, res, next) {
+  var tmp = await Movie.find({ status: 'finished' }).sort('-createAt').exec();
+  res.render('allMovies', {
+    movies: tmp
+  });
+});
+
 router.post('/movies/del', async function (req, res, next) {
   var data = req.body['data[]'];
   var response = await Movie.deleteMany({ _id: { $in: data } }).exec();
+  for (var i = 0; i < data.length; i++) {
+    deleteall('./output/' + data[0])
+  }
   res.json(response);
 });
 
@@ -55,13 +77,27 @@ router.get('/scan', function (req, res, next) {
           }
           if (isDir) {
             var category = filename;
-            saveMovies2mongodb(filedir+'/', category);
+            saveMovies2mongodb(filedir + '/', category);
           }
         }
       })
     });
     res.json({ success: 1 });
   });
+});
+
+router.get('/transcode', function (req, res, next) {
+  Movie
+    .find({ status: { $ne: "finished" } })
+    .exec(function (err, movies) {
+      if (err) {
+        console.log(err);
+      }
+      for (let i = 0; i < movies.length; i++) {
+        FFmpeghelper.transcode(movies[i]);
+      }
+      res.redirect('/');
+    });
 });
 
 function saveMovies2mongodb(dir, category) {
@@ -107,5 +143,19 @@ function saveMovies2mongodb(dir, category) {
   });
 }
 
-
+function deleteall(path) {
+  var files = [];
+  if (fs.existsSync(path)) {
+    files = fs.readdirSync(path);
+    files.forEach(function (file, index) {
+      var curPath = path + "/" + file;
+      if (fs.statSync(curPath).isDirectory()) { // recurse
+        deleteall(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
 module.exports = router;

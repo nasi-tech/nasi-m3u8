@@ -1,0 +1,7 @@
+<% include include/header.html %>
+<div class="container">
+    <% movies.forEach(function(movie){ %>
+        <a href="/movies/<%= movie._id %>"><%= movie.originalname %></p>
+      <% }); %>
+</div>
+<% include include/footer.html %>

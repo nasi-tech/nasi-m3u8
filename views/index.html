@@ -1,8 +1,8 @@
-{{include './include/header.html'}}
+<% include include/header.html %>
 <div class="container">
-    <button type="button" class="btn btn-primary">
+    <a href="/transcode" class="btn btn-primary">
         <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> 转码列队
-    </button>
+    </a>
     <button type="button" class="btn btn-primary" id="read">
         <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> 读取文件
     </button>
@@ -22,11 +22,11 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>{{total}}</td>
-                    <td>{{finished}}</td>
-                    <td>{{processing}}</td>
-                    <td>{{waiting}}</td>
-                    <td>{{error}}</td>
+                    <td><%=total%></td>
+                    <td><%=finished%></td>
+                    <td><%=processing%></td>
+                    <td><%=waiting%></td>
+                    <td><%=error%></td>
                 </tr>
             </tbody>
         </table>
@@ -55,7 +55,7 @@
                 <th data-field="state" data-checkbox="true"></th>
                 <!-- <th data-field="_id">ID</th> -->
                 <th data-field="originalname">Title</th>
-                <th data-field="category">Category</th>
+                <th data-field="category" data-sortable="true">Category</th>
                 <th data-field="createAt" data-formatter="dateFormat" data-sortable="true">Date</th>
                 <th data-field="status" data-formatter="status" data-sortable="true">Status</th>
             </tr>
@@ -63,4 +63,4 @@
     </table>
 
 </div>
-{{include './include/footer.html'}}
+<% include include/footer.html %>
