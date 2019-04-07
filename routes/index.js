@@ -4,6 +4,9 @@ var fs = require('fs');
 var Movie = require('../models/movie');
 var FFmpeghelper = require('../utiles/newffmpeg');
 
+const fse = require('fs-extra')
+
+
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   var responses = await Movie.find().sort('-createAt').exec();
@@ -11,7 +14,7 @@ router.get('/', async function (req, res, next) {
     return value.status == 'finished'
   }).length;
   var processing = responses.filter(function (value, index, array) {
-    return value.status == 'converting'
+    return value.status == 'chunking'
   }).length;
   var waiting = responses.filter(function (value, index, array) {
     return value.status == 'waiting'
@@ -49,7 +52,12 @@ router.post('/movies/del', async function (req, res, next) {
   var data = req.body['data[]'];
   var response = await Movie.deleteMany({ _id: { $in: data } }).exec();
   for (var i = 0; i < data.length; i++) {
-    deleteall('./output/' + data[0])
+    try {
+      await fse.remove('./output/' + data[i]);
+      console.log('[Delete] success! ' + data[i])
+    } catch (err) {
+      console.error(err)
+    }
   }
   res.json(response);
 });

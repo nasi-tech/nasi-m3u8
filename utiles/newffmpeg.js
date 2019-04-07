@@ -112,7 +112,7 @@ exports.transcode = function (movie) {
 function ffmpegtransandchunk(des, path, config, vf, id) {
     ffmpeg(path)
         .addOptions(config)
-       // .addOption('-vf', vf)
+        // .addOption('-vf', vf)
         .output(des + '/index.m3u8')
         .on('start', function () {
             Movie.findOne({
@@ -161,7 +161,8 @@ function screenshots(path, des) {
                     folder: des
                 })
                 .on('end', function () {
-                   // thumbnails(des, path);
+                    // thumbnails(des, path);
+                    togif(path, des, setting[0]);
                 });
         });
 }
@@ -233,3 +234,22 @@ function deleteall(path) {
         fs.rmdirSync(path);
     }
 };
+function togif(path, des, setting) {
+    const { gifduration, gifstart, gifwidth } = setting;
+    if (gifduration && gifstart && gifwidth) {
+        ffmpeg(path)
+            .addOptions([
+                '-ss ' + gifstart,
+                '-t ' + gifduration,
+                '-r 15',
+                '-vf scale=' + gifwidth + ':-1'
+            ])
+            .output(des + '/1.gif')
+            .on('end', function () {
+                fs.unlinkSync(path);
+            })
+            .run();
+    } else {
+        fs.unlinkSync(path);
+    }
+}
