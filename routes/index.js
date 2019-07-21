@@ -4,33 +4,38 @@ var fs = require('fs');
 var Movie = require('../models/movie');
 var FFmpeghelper = require('../utiles/newffmpeg');
 
-const fse = require('fs-extra')
-
+const fse = require('fs-extra');
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   var responses = await Movie.find().sort('-createAt').exec();
   var finished = responses.filter(function (value, index, array) {
-    return value.status == 'finished'
+    return value.status == 'finished';
   }).length;
 
   var processing1 = responses.filter(function (value, index, array) {
-    return value.status == 'chunking'
+    return value.status == 'chunking';
   }).length;
 
   var processing2 = responses.filter(function (value, index, array) {
-    return value.status == 'trans&chunk'
+    return value.status == 'trans&chunk';
   }).length;
 
   var waiting = responses.filter(function (value, index, array) {
-    return value.status == 'waiting'
+    return value.status == 'waiting';
   }).length;
 
   var error = responses.filter(function (value, index, array) {
-    return value.status == 'error & failed'
+    return value.status == 'error & failed';
   }).length;
 
-  res.render('index', { total: responses.length, finished: finished, processing: processing1 + processing2, waiting: waiting, error: error });
+  res.render('index', {
+    total: responses.length,
+    finished: finished,
+    processing: processing1 + processing2,
+    waiting: waiting,
+    error: error
+  });
 });
 
 router.get('/movies', async function (req, res, next) {
@@ -39,7 +44,9 @@ router.get('/movies', async function (req, res, next) {
 });
 
 router.get('/movies/:id', async function (req, res, next) {
-  var tmp = await Movie.find({ _id: req.params.id }).exec();
+  var tmp = await Movie.find({
+    _id: req.params.id
+  }).exec();
   if (tmp.length > 0) {
     res.render('movie', {
       movie: tmp[0]
@@ -50,7 +57,9 @@ router.get('/movies/:id', async function (req, res, next) {
 });
 
 router.get('/allMovies', async function (req, res, next) {
-  var tmp = await Movie.find({ status: 'finished' }).sort('-createAt').exec();
+  var tmp = await Movie.find({
+    status: 'finished'
+  }).sort('-createAt').exec();
   res.render('allMovies', {
     movies: tmp
   });
@@ -58,13 +67,17 @@ router.get('/allMovies', async function (req, res, next) {
 
 router.post('/movies/del', async function (req, res, next) {
   var data = req.body['data[]'];
-  var response = await Movie.deleteMany({ _id: { $in: data } }).exec();
+  var response = await Movie.deleteMany({
+    _id: {
+      $in: data
+    }
+  }).exec();
   for (var i = 0; i < data.length; i++) {
     try {
       await fse.remove('./output/' + data[i]);
-      console.log('[Delete] success! ' + data[i])
+      console.log('[Delete] success! ' + data[i]);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
   }
   res.json(response);
@@ -73,10 +86,9 @@ router.post('/movies/del', async function (req, res, next) {
 router.get('/scan', function (req, res, next) {
   fs.readdir('./input', function (err, files) {
     if (err) {
-      console.log(err);
+      return;
     }
     var filePath = './input/';
-
     // 读取文件夹内容
     files.forEach(function (filename) {
       //获取当前文件的绝对路径
@@ -86,8 +98,8 @@ router.get('/scan', function (req, res, next) {
         if (eror) {
           console.warn('获取文件stats失败');
         } else {
-          var isFile = stats.isFile();//是文件
-          var isDir = stats.isDirectory();//是文件夹
+          var isFile = stats.isFile(); //是文件
+          var isDir = stats.isDirectory(); //是文件夹
           if (isFile) {
             saveMovies2mongodb(filename, "default");
           }
@@ -98,13 +110,19 @@ router.get('/scan', function (req, res, next) {
         }
       })
     });
-    res.json({ success: 1 });
+    res.json({
+      success: 1
+    });
   });
 });
 
 router.get('/transcode', function (req, res, next) {
   Movie
-    .find({ status: { $ne: "finished" } })
+    .find({
+      status: {
+        $ne: "finished"
+      }
+    })
     .exec(function (err, movies) {
       if (err) {
         console.log(err);
@@ -131,7 +149,9 @@ function saveMovies2mongodb(dir, category) {
             fs.renameSync(dir + file, dir + savepath);
             titlearr.splice(-1, 1);
             var title = titlearr.join('.');
-            Movie.findOne({ originalname: title }).exec(function (err, movie) {
+            Movie.findOne({
+              originalname: title
+            }).exec(function (err, movie) {
               if (err) {
                 console.log(err);
               }

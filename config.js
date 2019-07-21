@@ -3,4 +3,4 @@ module.exports = {
     db: 'ffmpeg',
     username: '',
     password: ''
-}
+};

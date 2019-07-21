@@ -14,8 +14,9 @@ exports.transcode = function (movie) {
             fs.mkdir(des, function (err) {
                 if (err) {
                     console.log(err);
+                    return;
                 }
-            })
+            });
         }
     });
     ffmpeg.ffprobe(path, function (err, metadata) {
@@ -25,7 +26,8 @@ exports.transcode = function (movie) {
         Setting.find()
             .exec(function (err, setting) {
                 var wmimage = setting[0].wmpath;
-                var hd = setting[0].hd * 1;
+                // var hd = setting[0].hd * 1;
+                var hd = 720;
                 var wd = 0;
                 var markdir = "./public/mark/mark.png";
                 var videometa = metadata.format;
@@ -75,7 +77,7 @@ exports.transcode = function (movie) {
                         break;
                     }
                 }
-                for (var i = 0; i < videostreams.length; i++) {
+                for (let i = 0; i < videostreams.length; i++) {
                     if (videostreams[i].codec_type == 'audio') {
                         audiooriginC = videostreams[i].codec_name;
                         break;
@@ -105,9 +107,9 @@ exports.transcode = function (movie) {
                 }
 
             });
-    })
+    });
 
-}
+};
 
 function ffmpegtransandchunk(des, path, config, vf, id) {
     ffmpeg(path)
@@ -116,16 +118,17 @@ function ffmpegtransandchunk(des, path, config, vf, id) {
         .on('start', function () {
             Movie.findOne({
                 _id: id
-            })
-                .exec(function (err, movie) {
+            }).exec(function (err, movie) {
+                if (err) {
+                    console.log(err);
+                }
+                movie.status = "trans&chunk";
+                movie.save(function (err) {
                     if (err) {
-                        console.log(err);
+                        console.log('错误啦');
                     }
-                    movie.status = "trans&chunk";
-                    movie.save(function (err) {
-                        console.log(err);
-                    })
                 });
+            });
         })
         .on('error', function (err, stdout, stderr) {
             console.log('Cannot process video: ' + err.message);
@@ -133,8 +136,8 @@ function ffmpegtransandchunk(des, path, config, vf, id) {
         .on('end', function () {
             screenshots(path, des);
             Movie.findOne({
-                _id: id
-            })
+                    _id: id
+                })
                 .exec(function (err, movie) {
                     if (err) {
                         console.log(err);
@@ -142,11 +145,12 @@ function ffmpegtransandchunk(des, path, config, vf, id) {
                     movie.status = "finished";
                     movie.save(function (err) {
                         console.log(err);
-                    })
-                })
+                    });
+                });
         })
-        .run()
+        .run();
 }
+
 function screenshots(path, des) {
     Setting.find()
         .exec(function (err, setting) {
@@ -165,6 +169,7 @@ function screenshots(path, des) {
                 });
         });
 }
+
 function chunk(path, des, id, config, vf, tsjiami) {
     var chunkconfig = [
         '-c copy',
@@ -180,8 +185,8 @@ function chunk(path, des, id, config, vf, tsjiami) {
         .on('end', function () {
             screenshots(path, des);
             Movie.findOne({
-                _id: id
-            })
+                    _id: id
+                })
                 .exec(function (err, movie) {
                     if (err) {
                         console.log(err);
@@ -189,22 +194,22 @@ function chunk(path, des, id, config, vf, tsjiami) {
                     movie.status = "finished";
                     movie.save(function (err) {
                         console.log(err);
-                    })
-                })
+                    });
+                });
         })
         .on('error', function (err, stdout, stderr) {
-            console.log(err)
+            console.log(err);
             console.log('Cannot chunk video: ' + path + err.message);
             deleteall(des);
-            console.log(des)
+            console.log(des);
             var tmp = fs.mkdirSync(des);
             console.log('202=>' + tmp);
             ffmpegtransandchunk(des, path, config, vf, id);
         })
         .on("start", function () {
             Movie.findOne({
-                _id: id
-            })
+                    _id: id
+                })
                 .exec(function (err, movie) {
                     if (err) {
                         console.log(err);
@@ -213,11 +218,11 @@ function chunk(path, des, id, config, vf, tsjiami) {
                     movie.status = "chunking";
                     movie.save(function (err) {
                         console.log(err);
-                    })
+                    });
                 });
-        })
-        .run()
+        }).run();
 }
+
 function deleteall(path) {
     var files = [];
     if (fs.existsSync(path)) {
@@ -232,7 +237,8 @@ function deleteall(path) {
         });
         fs.rmdirSync(path);
     }
-};
+}
+
 function togif(path, des, setting) {
     // const { gifduration, gifstart, gifwidth } = setting;
     // if (gifduration && gifstart && gifwidth) {
