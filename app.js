@@ -10,10 +10,11 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 // mongodb
-mongoose.connect('mongodb://' + config.username + ':' + config.password + '@' + config.host + '/' + config.db + '', {
+mongoose.connect('mongodb://' + config.host + '/' + config.db + '', {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
 });
 
 app.use(logger('dev'));
@@ -23,7 +24,7 @@ app.set('view engine', 'html');
 app.engine('html', require('ejs').__express);
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/videos', express.static(path.join(__dirname, 'output')));
@@ -31,8 +32,7 @@ app.use('/videos', express.static(path.join(__dirname, 'output')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-
-app.use('/videos/:id/index.m3u8', function (req, res, next) {
+app.use('/videos/:id/index.m3u8', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'POST, GET');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With');
